@@ -74,6 +74,7 @@ def soloq(time):
     df = df.groupby(['Player', 'phrase','last']).agg({'Games': 'sum'})
     df = df.reset_index()
     df = df[["Player","phrase","Games","last"]]
+    df = df.sort_values(by=['Games'], ascending = False)
     xd = tabulate(df, showindex=False)
     print(xd)
     return xd
