@@ -2,61 +2,81 @@ import discord
 from discord.ext import commands, tasks
 import random
 from riotwatcher import LolWatcher, ApiError
+from lol_pros_accounts import LolProsAcc
+from config import *
 import pandas as pd
 import csv
 import time
 import sys
+from tabulate import tabulate
 
 #VARIABLES
-api_key = 'INSERT API KEY HERE' # here please put in-between the quotes your Riot API Developer Key
+team_mh = []
+game_nbrs = []
 watcher = LolWatcher(api_key)
-my_region = 'euw1'
-region = 'europe'
 current_time = int(time.time())
-last = (current_time - 86400)
+day = (current_time - 86400)
 week = (current_time - 604800)
 two = (current_time - 172800)
-print(current_time)
-print(last)
 
-#PUUIDS ----------------------------------
-top_id = 'fQwRacUndeCleiOeQi4qm4WTFuoqSZg7SXnQWeAepWZPZ6teQ7Aytl5wAoAG3ltsM_ZcNT904BbIUg' # here write the puuid of your toplaner
-jgl_id = 'Kae9k0d4l2o6sKblB36Pm-IuPjgDNFLu2Vz0ODNcOG2PaNVXRWL27j82I7-UKGCwDgifz82RrT6zQA' # here write the puuid of your jungler
-mid_id = '4B_9lFf5JU4onY__sQyZY6RVVNrXnsCsX6vqYgjWKjlFqnGj4Vb0gxCa0mUMWU8uK_6NM-IeqaB_ag' # here write the puuid of your midlaner
-adc_id = 'eCze5I2zMSyG4x84qyVrlbJjQOdyr6cn6IPah6AOjpZA7x6LBm4EtdMUJzjR8EAZBazCsGqSy7-oTw' # here write the puuid of your ad carry
-sup_id = 'IQYpa2gn6ocPcdte-LHXNk8VTVSrcFY6EzfJqux4Nw33wonDXugp6bChZm3bY5-hC2d-2g_17HfMGg' # here write the puuid of your support
-team_id = [top_id, jgl_id, mid_id, adc_id, sup_id]
-team_mh = []
-#CALCULS ----------------------------------
-player_name = ['Toplaner', 'Jungler', 'Midlaner', 'ADCarry', 'Support']
-game_nbrs = []
+def soloq(time):
+    #PLAYERS
+    team_id = []
+    comp_names = []
+    L = LolProsAcc
+    accounts = L.accountsByPlayers(player_name)
 
-# DAY COMMAND ----------------------------------
-if sys.argv[1] == "day":
-    team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=last, end_time=current_time, count=100)) for id in team_id]
-# WEEK COMMAND ----------------------------------
-if sys.argv[1] == "week":
-    team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=week, end_time=current_time, count=100)) for id in team_id]
 
-#LAST TWO DAYS COMMAND ----------------------------------
-if sys.argv[1] == "two":
-    team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=two, end_time=current_time, count=100)) for id in team_id]
+    for secret in secret_accs:
+        soloq_name = secret[1]
+        comp_name = secret[0]
+        puuid = watcher.summoner.by_name(my_region,soloq_name)['puuid']
+        
+        team_id.append(puuid)
+        comp_names.append(comp_name)
 
-# API DATAFRAME CREATION ----------------------------------
-game_nbrs = [len(elt) for elt in team_mh]
+    for account in accounts:
+        soloq_name = account[1]
+        comp_name = account[0]
+        puuid = watcher.summoner.by_name(my_region,soloq_name)['puuid']
 
-df = pd.DataFrame(
-    {'Player': player_name,
-    'phrase': "has played",
-    'Games': game_nbrs,
-    'last': "games of soloQ in the last 24 hours.",
-})
+        team_id.append(puuid)
+        comp_names.append(comp_name)
 
-print(df)
+    # DAY COMMAND ----------------------------------
+    if time == "day":
+        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=day, end_time=current_time, count=100)) for id in team_id]
+    # WEEK COMMAND ----------------------------------
+    if time == "week":
+        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=week, end_time=current_time, count=100)) for id in team_id]
 
-i = 0
-df1 = df.loc[[i]]
+    #LAST TWO DAYS COMMAND ----------------------------------
+    if time == "two":
+        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=two, end_time=current_time, count=100)) for id in team_id]
+    
 
+    # API DATAFRAME CREATION ----------------------------------
+    game_nbrs = [len(elt) for elt in team_mh]
+
+    #prepering time string for output message
+    if time == "two":
+        last_time = "two days"
+    else:
+        last_time = time
+
+    df = pd.DataFrame(
+        {'Player': comp_names,
+        'phrase': "has played",
+        'Games': game_nbrs,
+        'last': "games of soloQ in the last "+last_time+".",
+    })
+
+    df = df.groupby(['Player', 'phrase','last']).agg({'Games': 'sum'})
+    df = df.reset_index()
+    df = df[["Player","phrase","Games","last"]]
+    xd = tabulate(df, showindex=False)
+    print(xd)
+    return xd
 
 #DISCORD BOT COMMANDS ----------------------------------
 bot = commands.Bot(command_prefix = "!", description = "SoloQ Bot")
@@ -66,11 +86,20 @@ async def on_ready():
 	print("Your soloQ bot is ready for use !")
 
 @bot.command()
-async def soloQ(ctx):
-    await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
-    for i in range(5):
-        df1 = df.loc[[i]]
-        await ctx.send(df1.to_string(header=False, index=False))
-        i = i + 1
+async def soloQ(ctx, time):
+    if time == "week":
+        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
+        await ctx.send(soloq("week"))
+        
+    elif time == "day":
+        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
+        await ctx.send(soloq("day"))
 
-bot.run("INSERT DISCORD BOT TOKEN HERE") # here paste in-between double quotes your discord bot token
+    elif time == "two":
+        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
+        await ctx.send(soloq("two"))
+    
+    else:
+        return
+
+bot.run(discord_key)
