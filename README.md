@@ -1,5 +1,5 @@
 # SoloQ Tracker:
-This is fork of script made by @aries_lol.
+This is fork of script made by @aries_lol.<br />
 The script is supposed to help coaches in League of Legends teams to keep track on how much ranked games is being played by their players.
 
 ## Changes
@@ -8,7 +8,7 @@ The script is supposed to help coaches in League of Legends teams to keep track 
 - Added parameter to command, so you can decide for which time period bot will search for games.
 
 # Installation:
-1) From the Discord developer website, create an application & a bot, follow this tutorial: https://betterprogramming.pub/coding-a-discord-bot-with-python-64da9d6cade7
+1) From the Discord developer website, create an application & a bot, follow this <a href="https://betterprogramming.pub/coding-a-discord-bot-with-python-64da9d6cade7" target="_blank">tutorial</a>: 
 2) Clone this repository.
 3) Once your discord bot is loaded on your Team server, here are things that you need to modify in our python script:
 	1) IN 'config.py' change the following:
@@ -28,11 +28,11 @@ After setting up the script, everything is pretty straight forward in terms of u
 ![alt text](https://media.discordapp.net/attachments/958796003048321135/974867207106486282/unknown.png)
 
 3) Now use following command in server:
-	**!soloQ [number of days (1-90)]**
-	For example:  
+	**!soloQ [number of days (1-90)]**<br />
+	For example:  <br />
 	**"!soloQ 1"** - this will output number of games played per player for the last 24 hours.
 
-	It should print like this:
+	It should print like this:<br />
 	![alt text](https://media.discordapp.net/attachments/958796003048321135/975407630866599976/unknown.png)
 	
 Have fun! 
