@@ -12,8 +12,7 @@ class LolProsAcc:
             with urllib.request.urlopen(url+playername) as url:
                 index = json.loads(url.read().decode())
 
-        #filtering player account (plat+) and adding it to dictionairy
             for y in index['league_player']['accounts']:
-                if int(y['rank']['tier'].split("_")[0])<40:
-                    accounts.append((index['name'],y['summoner_name']))
+                accounts.append((index['name'],y['summoner_name']))
+                
         return accounts

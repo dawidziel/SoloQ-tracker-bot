@@ -1,21 +1,17 @@
 import discord
 from discord.ext import commands, tasks
-import random
 from riotwatcher import LolWatcher, ApiError
 from lol_pros_accounts import LolProsAcc
 from config import *
 import pandas as pd
-import csv
 import time
 import sys
 from tabulate import tabulate
 
 #VARIABLES
-team_mh = []
-game_nbrs = []
 watcher = LolWatcher(api_key)
 current_time = int(time.time())
-day = (current_time - 86400)
+day = 86400
 week = (current_time - 604800)
 two = (current_time - 172800)
 
@@ -23,6 +19,8 @@ def soloq(time):
     #PLAYERS
     team_id = []
     comp_names = []
+    team_mh = []
+    game_nbrs = []
     L = LolProsAcc
     accounts = L.accountsByPlayers(player_name)
 
@@ -43,32 +41,34 @@ def soloq(time):
         team_id.append(puuid)
         comp_names.append(comp_name)
 
-    # DAY COMMAND ----------------------------------
-    if time == "day":
-        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=day, end_time=current_time, count=100)) for id in team_id]
-    # WEEK COMMAND ----------------------------------
-    if time == "week":
-        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=week, end_time=current_time, count=100)) for id in team_id]
-
-    #LAST TWO DAYS COMMAND ----------------------------------
-    if time == "two":
-        team_mh = [list(watcher.match.matchlist_by_puuid(region, id, type="ranked", start_time=two, end_time=current_time, count=100)) for id in team_id]
+    # Returning list of games for every player in the time period between 1 to 365
+    if 90 >= int(time) > 0:
+        for id in team_id:
+            player_mh = []
+            player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=current_time, count=100))
+            while len(player_mh) % 100 == 0 and len(player_mh) > 0:
+                last_id = player_mh[-1]
+                last_date = str(watcher.match.by_id(my_region,last_id)['info']['gameCreation'])[:10]
+                player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=int(last_date), count=100))
+            team_mh.append(player_mh)
+    else:
+        return "After !soloQ there should be a number from 1 to 90"
     
 
     # API DATAFRAME CREATION ----------------------------------
     game_nbrs = [len(elt) for elt in team_mh]
 
     #prepering time string for output message
-    if time == "two":
-        last_time = "two days"
+    if time == "1":
+        time = "1 day."
     else:
-        last_time = time
+        time = str(time) + " days."
 
     df = pd.DataFrame(
         {'Player': comp_names,
         'phrase': "has played",
         'Games': game_nbrs,
-        'last': "games of soloQ in the last "+last_time+".",
+        'last': " games of soloQ in the last "+time,
     })
 
     df = df.groupby(['Player', 'phrase','last']).agg({'Games': 'sum'})
@@ -88,19 +88,12 @@ async def on_ready():
 
 @bot.command()
 async def soloQ(ctx, time):
-    if time == "week":
-        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
-        await ctx.send(soloq("week"))
-        
-    elif time == "day":
-        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
-        await ctx.send(soloq("day"))
-
-    elif time == "two":
-        await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
-        await ctx.send(soloq("two"))
-    
-    else:
-        return
-
+    try:
+        if 90 >= int(time) > 0:
+            await ctx.send("https://c.tenor.com/bVOjfxYAE4UAAAAd/fire-extinguisher.gif")
+            await ctx.send(soloq(time))
+        else:
+            return
+    except:
+        await ctx.send("ERROR - Try command !soloQ [number of days]")
 bot.run(discord_key)
