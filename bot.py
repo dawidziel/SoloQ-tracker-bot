@@ -8,7 +8,6 @@ import time
 import sys
 from tabulate import tabulate
 
-#VARIABLES
 watcher = LolWatcher(api_key)
 current_time = int(time.time())
 day = 86400
@@ -16,7 +15,7 @@ week = (current_time - 604800)
 two = (current_time - 172800)
 
 def soloq(time):
-    #PLAYERS
+    #Variables
     team_id = []
     comp_names = []
     team_mh = []
@@ -24,7 +23,7 @@ def soloq(time):
     L = LolProsAcc
     accounts = L.accountsByPlayers(player_name)
 
-
+    #iterating over secret accounts and extending puuid list
     for secret in secret_accs:
         soloq_name = secret[1]
         comp_name = secret[0]
@@ -33,6 +32,7 @@ def soloq(time):
         team_id.append(puuid)
         comp_names.append(comp_name)
 
+    #iterating over lolpros accounts 
     for account in accounts:
         soloq_name = account[1]
         comp_name = account[0]
@@ -90,7 +90,7 @@ async def on_ready():
 async def soloQ(ctx, time):
     try:
         if 90 >= int(time) > 0:
-            await ctx.send("https://c.tenor.com/bVOjfxYAE4UAAAAd/fire-extinguisher.gif")
+            await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
             await ctx.send(soloq(time))
         else:
             return
