@@ -42,17 +42,14 @@ def soloq(time):
         comp_names.append(comp_name)
 
     # Returning list of games for every player in the time period between 1 to 365
-    if 90 >= int(time) > 0:
-        for id in team_id:
-            player_mh = []
-            player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=current_time, count=100))
-            while len(player_mh) % 100 == 0 and len(player_mh) > 0:
-                last_id = player_mh[-1]
-                last_date = str(watcher.match.by_id(my_region,last_id)['info']['gameCreation'])[:10]
-                player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=int(last_date), count=100))
-            team_mh.append(player_mh)
-    else:
-        return "After !soloQ there should be a number from 1 to 90"
+    for id in team_id:
+        player_mh = []
+        player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=current_time, count=100))
+        while len(player_mh) % 100 == 0 and len(player_mh) > 0:
+            last_id = player_mh[-1]
+            last_date = str(watcher.match.by_id(my_region,last_id)['info']['gameCreation'])[:10]
+            player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=int(last_date), count=100))
+        team_mh.append(player_mh)
     
 
     # API DATAFRAME CREATION ----------------------------------
@@ -93,7 +90,7 @@ async def soloQ(ctx, time):
             await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
             await ctx.send(soloq(time))
         else:
-            return
+            await ctx.send("After !soloQ there should be a number from 1 to 90")
     except:
         await ctx.send("ERROR - Try command !soloQ [number of days]")
 bot.run(discord_key)

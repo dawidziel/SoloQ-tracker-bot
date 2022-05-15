@@ -16,6 +16,7 @@ player_name = [
     ]
 
  #List of secret accounts (not seen by lolpros)
+ #CHANGE IT TO BLANK IF NOT NEEDED (like this "= []")
 secret_accs = [
     ("lolpros acc","In Game Name"),    #first name is COMPETITIVE ID and second is SOLOQ ACCOUNT NAME
     ("randomguy","A Random Guy")       #make sure that lolpros acc is exactly the same as in lolpros (with same capital letters)
