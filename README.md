@@ -8,7 +8,7 @@ The script is supposed to help coaches in League of Legends teams to keep track 
 - Added parameter to command, so you can decide for which time period bot will search for games.
 
 # Installation:
-1) From the Discord developer website, create an application & a bot, follow this tutorial: https://betterprogramming.pub/coding-a-discord-bot-with-python-64da9d6cade7
+1) From the Discord developer website, create an application & a bot, follow this <a href="https://betterprogramming.pub/coding-a-discord-bot-with-python-64da9d6cade7" target="_blank">tutorial</a>: 
 2) Clone this repository.
 3) Once your discord bot is loaded on your Team server, here are things that you need to modify in our python script:
 	1) IN 'config.py' change the following:
