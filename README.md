@@ -32,5 +32,8 @@ After setting up the script, everything is pretty straight forward in terms of u
 	For example:  
 	**"!soloQ 1"** - this will output number of games played per player for the last 24 hours.
 
+	It should print like this:
+	![alt text](https://media.discordapp.net/attachments/958796003048321135/975407630866599976/unknown.png)
+	
 Have fun! 
 ...and maybe follow me on twitter if you liked it	-	@dywan1na :)
