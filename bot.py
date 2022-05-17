@@ -10,13 +10,12 @@ from tabulate import tabulate
 
 
 
-def soloq(time):
+def soloq(day_nr):
     #Variables
     watcher = LolWatcher(api_key)
-    current_time = int(time.time())
     day = 86400
-    week = (current_time - 604800)
-    two = (current_time - 172800)
+    current_time = int(time.time())
+    start_time = current_time-day*int(day_nr)
     team_id = []
     comp_names = []
     team_mh = []
@@ -45,11 +44,11 @@ def soloq(time):
     # Returning list of games for every player in the time period between 1 to 365
     for id in team_id:
         player_mh = []
-        player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=current_time, count=100))
+        player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=start_time, end_time=current_time, count=100))
         while len(player_mh) % 100 == 0 and len(player_mh) > 0:
             last_id = player_mh[-1]
             last_date = str(watcher.match.by_id(my_region,last_id)['info']['gameCreation'])[:10]
-            player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=current_time-day*int(time), end_time=int(last_date), count=100))
+            player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=start_time, end_time=int(last_date), count=100))
         team_mh.append(player_mh)
     
 
@@ -57,16 +56,16 @@ def soloq(time):
     game_nbrs = [len(elt) for elt in team_mh]
 
     #prepering time string for output message
-    if time == "1":
-        time = "1 day."
+    if day_nr == "1":
+        day_nr = "1 day."
     else:
-        time = str(time) + " days."
+        day_nr = str(day_nr) + " days."
 
     df = pd.DataFrame(
         {'Player': comp_names,
         'phrase': "has played",
         'Games': game_nbrs,
-        'last': " games of soloQ in the last "+time,
+        'last': " games of soloQ in the last "+day_nr,
     })
 
     df = df.groupby(['Player', 'phrase','last']).agg({'Games': 'sum'})
@@ -85,11 +84,11 @@ async def on_ready():
 	print("Your soloQ bot is ready for use !")
 
 @bot.command()
-async def soloQ(ctx, time):
+async def soloQ(ctx, day_nr):
     try:
-        if 90 >= int(time) > 0:
+        if 90 >= int(day_nr) > 0:
             await ctx.send("https://tenor.com/view/cops-police-sirens-catching-crminals-what-you-gonna-do-gif-22472645")
-            await ctx.send(soloq(time))
+            await ctx.send(soloq(day_nr))
         else:
             await ctx.send("After !soloQ there should be a number from 1 to 90")
     except:
