@@ -8,14 +8,15 @@ import time
 import sys
 from tabulate import tabulate
 
-watcher = LolWatcher(api_key)
-current_time = int(time.time())
-day = 86400
-week = (current_time - 604800)
-two = (current_time - 172800)
+
 
 def soloq(time):
     #Variables
+    watcher = LolWatcher(api_key)
+    current_time = int(time.time())
+    day = 86400
+    week = (current_time - 604800)
+    two = (current_time - 172800)
     team_id = []
     comp_names = []
     team_mh = []
