@@ -45,10 +45,16 @@ def soloq(day_nr):
     for id in team_id:
         player_mh = []
         player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=start_time, end_time=current_time, count=100))
+
+        count = 0   #will be used to make sure loop wont stuck if player played 100 games exactly
         while len(player_mh) % 100 == 0 and len(player_mh) > 0:
             last_id = player_mh[-1]
             last_date = str(watcher.match.by_id(my_region,last_id)['info']['gameCreation'])[:10]
             player_mh.extend(watcher.match.matchlist_by_puuid(region, id, queue=420, start_time=start_time, end_time=int(last_date), count=100))
+
+            if count > 0 and len(player_mh)==100:
+                break
+            count = count + 1
         team_mh.append(player_mh)
     
 
