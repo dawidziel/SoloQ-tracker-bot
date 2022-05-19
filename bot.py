@@ -53,7 +53,6 @@ def soloq(day_nr):
 
             if old_count == player_mh:
                 break
-            count = count + 1
         team_mh.append(player_mh)
     
 
