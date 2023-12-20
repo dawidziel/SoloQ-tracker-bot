@@ -25,7 +25,7 @@ def soloq(day_nr):
 
     #iterating over secret accounts and extending puuid list
     for secret in secret_accs:
-        soloq_name = secret[1]
+        soloq_name = secret[1].split('#')[0]
         comp_name = secret[0]
         puuid = watcher.summoner.by_name(my_region,soloq_name)['puuid']
         
@@ -34,7 +34,7 @@ def soloq(day_nr):
 
     #iterating over lolpros accounts 
     for account in accounts:
-        soloq_name = account[1]
+        soloq_name = account[1].split('#')[0]
         comp_name = account[0]
         puuid = watcher.summoner.by_name(my_region,soloq_name)['puuid']
 
